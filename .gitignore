@@ -1,0 +1,13 @@
+# Swift
+.build/
+*.xcodeproj
+*.xcworkspace
+Package.resolved
+.swiftpm
+
+# macOS
+.DS_Store
+
+# Test artifacts
+appearance-notify-*.tar.gz
+~/appearance-notify-test.log
