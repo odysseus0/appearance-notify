@@ -128,3 +128,38 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and release process
 ## License
 
 MIT
+
+## Releasing (local)
+
+Prerequisites: `swift`, `gh` (logged in), `git-cliff`, `svu`, `sd`, `lipo`.
+
+Run:
+
+```bash
+# Option A: with just (recommended)
+just release
+
+# Option B: run steps separately
+just prepare && just publish
+```
+
+This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGELOG.md` (git-cliff), tags and pushes, builds a universal binary, creates a GitHub release with notes, and updates the Homebrew formula.
+
+### Developer Tasks
+
+```bash
+just version   # preview next tag and release notes (no changes)
+just prepare   # compute version, bump Version.swift, update CHANGELOG (no tag)
+just publish   # tag, build, verify, release, update formula
+just build     # builds universal binary and packages to dist/
+just lint      # run shellcheck on scripts
+just fmt       # format scripts with shfmt
+just clean     # removes dist/ and .build
+```
+
+Dev tools (Homebrew):
+```bash
+brew bundle            # installs from Brewfile (recommended)
+# or install individually
+brew install caarlos0/tap/svu git-cliff sd gh shellcheck shfmt
+```

@@ -6,15 +6,7 @@ class AppearanceNotify < Formula
   
   depends_on macos: :sonoma
   
-  on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/odysseus0/appearance-notify/releases/download/v0.2.0/appearance-notify-aarch64-apple-darwin.tar.gz"
-      sha256 "96503b5b86d2b84f1c92081e8112f9c60ec9d02c59b7a18d1b3094485f610afc" # arm64
-    else
-      url "https://github.com/odysseus0/appearance-notify/releases/download/v0.2.0/appearance-notify-x86_64-apple-darwin.tar.gz"
-      sha256 "a5bdc2f6f7d81be75d9869a6e72f703c1eabe17d437488248b7d7917bebd9d9e" # x86_64
     end
-  end
   
   def install
     bin.install "appearance-notify"
