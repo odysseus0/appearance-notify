@@ -5,7 +5,7 @@ Automatically sync developer tools with macOS appearance changes.
 ## Installation
 
 ```bash
-brew tap odysseus0/tap
+brew tap odysseus0/appearance-notify
 brew install appearance-notify
 brew services start appearance-notify
 ```
@@ -51,9 +51,34 @@ else
 fi
 ```
 
+## CLI
+
+Subcommands:
+- `daemon`: Start the watcher; runs hooks on start and on macOS appearance changes.
+- `run [--dark|--light]`: Run hooks once using system appearance, or force a mode.
+- `status`: Print the current system appearance (`dark` or `light`).
+
+Examples:
+```bash
+# One-shot using current system appearance
+appearance-notify run
+
+# Force dark or light without changing macOS appearance
+appearance-notify run --dark
+appearance-notify run --light
+
+# Print current appearance
+appearance-notify status
+
+# Start the long-running watcher (used by Homebrew services)
+appearance-notify daemon
+```
+
+No arguments prints concise help.
+
 ## Behavior
 
-- Runs hooks on startup and theme changes
+- Daemon runs hooks on startup and on theme changes
 - Executes all hooks in parallel
 - 30-second timeout (terminates long-running hooks)
 
@@ -63,10 +88,10 @@ View logs using macOS unified logging:
 
 ```bash
 # Stream logs in real-time
-log stream --predicate 'subsystem == "io.github.odysseus0.appearance-notify"'
+log stream --predicate 'subsystem == "com.appearance.notify"'
 
 # Show recent logs
-log show --predicate 'subsystem == "io.github.odysseus0.appearance-notify"' --last 1h
+log show --predicate 'subsystem == "com.appearance.notify"' --last 1h
 
 # Filter in Console.app
 # Open Console.app and search for "appearance-notify"
@@ -89,13 +114,52 @@ log show --predicate 'subsystem == "io.github.odysseus0.appearance-notify"' --la
 git clone https://github.com/odysseus0/appearance-notify.git
 cd appearance-notify
 swift build --configuration release
-./.build/release/appearance-notify
+./.build/release/appearance-notify --help
 ```
 
 ## Requirements
 
 - macOS 14+
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and release process.
+
 ## License
 
 MIT
+
+## Releasing (local)
+
+Prerequisites: `swift`, `gh` (logged in), `git-cliff`, `svu`, `sd`, `lipo`.
+
+Run:
+
+```bash
+# Option A: with just (recommended)
+just release
+
+# Option B: run steps separately
+just prepare && just publish
+```
+
+This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGELOG.md` (git-cliff), tags and pushes, builds a universal binary, creates a GitHub release with notes, and updates the Homebrew formula.
+
+### Developer Tasks
+
+```bash
+just version   # preview next tag and release notes (no changes)
+just prepare   # compute version, bump Version.swift, update CHANGELOG (no tag)
+just publish   # tag, build, verify, release, update formula
+just build     # builds universal binary and packages to dist/
+just lint      # run shellcheck on scripts
+just fmt       # format scripts with shfmt
+just clean     # removes dist/ and .build
+```
+
+Dev tools (Homebrew):
+```bash
+brew bundle            # installs from Brewfile (recommended)
+# or install individually
+brew install caarlos0/tap/svu git-cliff sd gh shellcheck shfmt
+```
