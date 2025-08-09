@@ -29,9 +29,10 @@ prepare: ensure
 publish: ensure
   scripts/publish.sh
 
-# Full release: depends on prepare then publish (DRY)
-release: prepare publish
-  @:
+# Full release: idempotent — uses existing preparation if present
+release: ensure
+  if [[ -f .release-state ]]; then echo "Using existing preparation (.release-state)"; else scripts/prepare.sh; fi
+  scripts/publish.sh
 
 # Lint shell scripts with shellcheck
 lint:

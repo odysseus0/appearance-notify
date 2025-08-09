@@ -2,6 +2,10 @@
 set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)
 cd "$ROOT_DIR"
+if [[ -f .release-state ]]; then
+  echo "Found .release-state; release is already prepared. Remove .release-state to re-run prepare."
+  exit 0
+fi
 git diff-index --quiet HEAD -- || {
   echo "Working tree not clean. Commit or stash changes first." >&2
   exit 1
@@ -23,15 +27,15 @@ ver_file="Sources/appearance-notify/Version.swift"
   exit 1
 }
 sd 'static let version = "[^"]*" // x-release-please-version' "static let version = \"$VERSION_NUM\" // x-release-please-version" "$ver_file"
-if ! git diff --quiet -- "$ver_file"; then
-  git add "$ver_file"
-  git commit -m "chore: bump version to $TAG"
-else echo "Version.swift already at $VERSION_NUM"; fi
 git-cliff --tag "$TAG" -o CHANGELOG.md
-if ! git diff --quiet -- CHANGELOG.md; then
-  git add CHANGELOG.md
-  git commit -m "chore: update changelog for $TAG"
-else echo "CHANGELOG.md unchanged"; fi
+
+# Stage both files if changed and commit once
+git add -A -- "$ver_file" CHANGELOG.md || true
+if ! git diff --cached --quiet -- "$ver_file" CHANGELOG.md; then
+  git commit -m "chore(release): $TAG"
+else
+  echo "No changes to commit for $TAG"
+fi
 cat > .release-state << EOT
 TAG=$TAG
 VERSION_NUM=$VERSION_NUM
