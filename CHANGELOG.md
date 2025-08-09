@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/odysseus0/appearance-notify/compare/v0.2.0...v0.3.0) (2025-08-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* Homebrew tap moved from odysseus0/homebrew-tap to odysseus0/appearance-notify
+
+### Features
+
+* implement full release automation with release-please ([990fc13](https://github.com/odysseus0/appearance-notify/commit/990fc1358e9d2f1a9aa10ebf81923187f5489e06))
+
 ## [0.2.0] - 2025-08-08
 
 ### Features
