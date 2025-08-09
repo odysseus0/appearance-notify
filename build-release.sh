@@ -1,6 +1,16 @@
 #!/bin/bash
 
+set -euo pipefail
+
 echo "Building release binaries..."
+
+# Determine version from env or latest git tag
+VERSION=${APP_VERSION:-$(git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)}
+echo "Version: $VERSION"
+
+# Update BuildInfo.version for this build
+echo "Stamping version into Sources/appearance-notify/Version.swift"
+sed -i '' -E "s/(static let version = \")([^\"]+)(\")/\\1$VERSION\\3/" Sources/appearance-notify/Version.swift
 
 # Build for Apple Silicon
 echo "Building for Apple Silicon (arm64)..."
@@ -31,3 +41,6 @@ echo "  - appearance-notify-aarch64-apple-darwin.tar.gz"
 echo "  - appearance-notify-x86_64-apple-darwin.tar.gz"
 echo ""
 echo "Upload these to GitHub releases and update the formula with the checksums."
+
+# Restore dev version in working copy (do not leave modified file around)
+git checkout -- Sources/appearance-notify/Version.swift >/dev/null 2>&1 || true

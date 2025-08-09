@@ -51,9 +51,34 @@ else
 fi
 ```
 
+## CLI
+
+Subcommands:
+- `daemon`: Start the watcher; runs hooks on start and on macOS appearance changes.
+- `run [--dark|--light]`: Run hooks once using system appearance, or force a mode.
+- `status`: Print the current system appearance (`dark` or `light`).
+
+Examples:
+```bash
+# One-shot using current system appearance
+appearance-notify run
+
+# Force dark or light without changing macOS appearance
+appearance-notify run --dark
+appearance-notify run --light
+
+# Print current appearance
+appearance-notify status
+
+# Start the long-running watcher (used by Homebrew services)
+appearance-notify daemon
+```
+
+No arguments prints concise help.
+
 ## Behavior
 
-- Runs hooks on startup and theme changes
+- Daemon runs hooks on startup and on theme changes
 - Executes all hooks in parallel
 - 30-second timeout (terminates long-running hooks)
 
@@ -89,7 +114,7 @@ log show --predicate 'subsystem == "io.github.odysseus0.appearance-notify"' --la
 git clone https://github.com/odysseus0/appearance-notify.git
 cd appearance-notify
 swift build --configuration release
-./.build/release/appearance-notify
+./.build/release/appearance-notify --help
 ```
 
 ## Requirements
