@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build binaries
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            arch_swift: arm64
+            runner: macos-latest
+          - arch: x86_64
+            arch_swift: x86_64
+            runner: macos-13  # Last Intel runner
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      
+      - name: Build binary
+        run: |
+          swift build -c release --arch ${{ matrix.arch_swift }}
+          mkdir -p dist
+          tar -czf dist/appearance-notify-${{ matrix.arch }}-apple-darwin.tar.gz \
+            -C .build/apple/Products/Release appearance-notify
+      
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/appearance-notify-${{ matrix.arch }}-apple-darwin.tar.gz
+  
+  update-formula:
+    name: Update Homebrew formula
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Download release assets and calculate SHA256
+        run: |
+          VERSION=${{ github.event.release.tag_name }}
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          VERSION_NUM="${VERSION#v}"
+          echo "VERSION_NUM=${VERSION_NUM}" >> $GITHUB_ENV
+          
+          # Download the tarballs
+          curl -sL -o arm64.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/${VERSION}/appearance-notify-aarch64-apple-darwin.tar.gz"
+          curl -sL -o x86_64.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/${VERSION}/appearance-notify-x86_64-apple-darwin.tar.gz"
+          
+          # Calculate SHA256
+          echo "SHA_ARM64=$(sha256sum arm64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+          echo "SHA_X86_64=$(sha256sum x86_64.tar.gz | cut -d' ' -f1)" >> $GITHUB_ENV
+      
+      - name: Update formula
+        run: |
+          # Update version
+          sed -i "s/version \".*\"/version \"${VERSION_NUM}\"/" Formula/appearance-notify.rb
+          
+          # Update URLs
+          sed -i "s|download/v[^/]*/appearance-notify-aarch64|download/${VERSION}/appearance-notify-aarch64|" Formula/appearance-notify.rb
+          sed -i "s|download/v[^/]*/appearance-notify-x86_64|download/${VERSION}/appearance-notify-x86_64|" Formula/appearance-notify.rb
+          
+          # Update SHA256 for arm64
+          sed -i "s/sha256 \"[a-f0-9]*\" # arm64/sha256 \"${SHA_ARM64}\" # arm64/" Formula/appearance-notify.rb
+          
+          # Update SHA256 for x86_64
+          sed -i "s/sha256 \"[a-f0-9]*\" # x86_64/sha256 \"${SHA_X86_64}\" # x86_64/" Formula/appearance-notify.rb
+      
+      - name: Commit and push formula update
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/appearance-notify.rb
+          git commit -m "chore: update formula for ${VERSION} [skip ci]"
+          git push

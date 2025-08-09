@@ -5,7 +5,7 @@ Automatically sync developer tools with macOS appearance changes.
 ## Installation
 
 ```bash
-brew tap odysseus0/tap
+brew tap odysseus0/appearance-notify
 brew install appearance-notify
 brew services start appearance-notify
 ```
@@ -88,10 +88,10 @@ View logs using macOS unified logging:
 
 ```bash
 # Stream logs in real-time
-log stream --predicate 'subsystem == "io.github.odysseus0.appearance-notify"'
+log stream --predicate 'subsystem == "com.appearance.notify"'
 
 # Show recent logs
-log show --predicate 'subsystem == "io.github.odysseus0.appearance-notify"' --last 1h
+log show --predicate 'subsystem == "com.appearance.notify"' --last 1h
 
 # Filter in Console.app
 # Open Console.app and search for "appearance-notify"
@@ -120,6 +120,10 @@ swift build --configuration release
 ## Requirements
 
 - macOS 14+
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and release process.
 
 ## License
 
