@@ -1,37 +1,23 @@
-# Changelog
+## [0.2.0] - 2025-08-09
 
-## [0.3.0](https://github.com/odysseus0/appearance-notify/compare/v0.2.0...v0.3.0) (2025-08-09)
+### 🚀 Features
 
+- Add CLI subcommands and modernize architecture
 
-### ⚠ BREAKING CHANGES
+### 🚜 Refactor
 
-* Homebrew tap moved from odysseus0/homebrew-tap to odysseus0/appearance-notify
+- Bring code to current state (Swift 6/CLI improvements)
 
-### Features
+### 📚 Documentation
 
-* implement full release automation with release-please ([990fc13](https://github.com/odysseus0/appearance-notify/commit/990fc1358e9d2f1a9aa10ebf81923187f5489e06))
+- Add local releasing flow and developer tasks
 
-## [0.2.0] - 2025-08-08
+### ⚙️ Miscellaneous Tasks
 
-### Features
-- Add CLI subcommands (daemon, run, status)
-- Add version support with --version flag
-- Modern Swift 6 architecture with async/await
-
-### Changed
-- Complete code restructure with separation of concerns
-- Restructure codebase into AppearanceService, Commands, and Main modules
-- Improve API with idiomatic Swift naming conventions
-
-### Security
-- Environment variable whitelisting for hook execution
-- File permission validation before execution
-- Add timeout for long-running hooks (30 seconds)
-
-## [0.1.0] - 2025-08-01
-
-### Features
-- Initial release
-- Monitor macOS appearance changes
-- Execute hooks on light/dark mode switch
-- Homebrew formula support
+- Add Brewfile + Justfile for local release flow
+- *(scripts)* Add build/prepare/publish; universal packaging
+- *(homebrew)* Simplify to universal tarball; remove arch conditionals
+- Ignore .build/ and dist/
+- *(release)* Bump version and changelog
+- Bump version to v0.2.0
+## [0.1.0] - 2025-07-27
