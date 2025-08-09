@@ -2,16 +2,37 @@
 set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)
 cd "$ROOT_DIR"
-git diff-index --quiet HEAD -- || { echo "Working tree not clean. Commit or stash changes first." >&2; exit 1; }
+git diff-index --quiet HEAD -- || {
+  echo "Working tree not clean. Commit or stash changes first." >&2
+  exit 1
+}
 VERSION_RAW=$(svu next)
-if [[ "$VERSION_RAW" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then TAG="$VERSION_RAW"; VERSION_NUM="${VERSION_RAW#v}"; elif [[ "$VERSION_RAW" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then TAG="v$VERSION_RAW"; VERSION_NUM="$VERSION_RAW"; else echo "Computed version invalid: $VERSION_RAW" >&2; exit 1; fi
+if [[ "$VERSION_RAW" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  TAG="$VERSION_RAW"
+  VERSION_NUM="${VERSION_RAW#v}"
+elif [[ "$VERSION_RAW" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  TAG="v$VERSION_RAW"
+  VERSION_NUM="$VERSION_RAW"
+else
+  echo "Computed version invalid: $VERSION_RAW" >&2
+  exit 1
+fi
 ver_file="Sources/appearance-notify/Version.swift"
-[[ -f "$ver_file" ]] || { echo "Missing $ver_file" >&2; exit 1; }
+[[ -f "$ver_file" ]] || {
+  echo "Missing $ver_file" >&2
+  exit 1
+}
 sd 'static let version = "[^"]*" // x-release-please-version' "static let version = \"$VERSION_NUM\" // x-release-please-version" "$ver_file"
-if ! git diff --quiet -- "$ver_file"; then git add "$ver_file"; git commit -m "chore: bump version to $TAG"; else echo "Version.swift already at $VERSION_NUM"; fi
+if ! git diff --quiet -- "$ver_file"; then
+  git add "$ver_file"
+  git commit -m "chore: bump version to $TAG"
+else echo "Version.swift already at $VERSION_NUM"; fi
 git-cliff --tag "$TAG" -o CHANGELOG.md
-if ! git diff --quiet -- CHANGELOG.md; then git add CHANGELOG.md; git commit -m "chore: update changelog for $TAG"; else echo "CHANGELOG.md unchanged"; fi
-cat > .release-state <<EOT
+if ! git diff --quiet -- CHANGELOG.md; then
+  git add CHANGELOG.md
+  git commit -m "chore: update changelog for $TAG"
+else echo "CHANGELOG.md unchanged"; fi
+cat > .release-state << EOT
 TAG=$TAG
 VERSION_NUM=$VERSION_NUM
 EOT
