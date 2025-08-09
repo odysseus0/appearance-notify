@@ -30,8 +30,10 @@ publish: ensure
   scripts/publish.sh
 
 # Full release: depends on prepare then publish (DRY)
-release: prepare publish
-  @:
+# Full release: idempotent — uses existing preparation if present
+release: ensure
+  if [[ -f .release-state ]]; then echo "Using existing preparation (.release-state)"; else scripts/prepare.sh; fi
+  scripts/publish.sh
 
 # Lint shell scripts with shellcheck
 lint:
@@ -46,3 +48,15 @@ fmt:
 # Clean build artifacts
 clean:
   rm -rf dist .build
+
+# Install via local Homebrew formula
+brew-local:
+  brew install --formula ./Formula/appearance-notify.rb
+
+# Reinstall via local Homebrew formula
+brew-reinstall:
+  brew reinstall --formula ./Formula/appearance-notify.rb
+
+# Uninstall the Homebrew formula
+brew-uninstall:
+  brew uninstall appearance-notify || true
