@@ -1,5 +1,12 @@
 set shell := ["bash", "-uc"]
 
+# Constants for Homebrew installs (edit if repo moves)
+owner := "odysseus0"
+repo := "appearance-notify"
+tap_name := "tap"
+tap := owner + "/" + tap_name
+formula := "appearance-notify"
+
 default:
   @just --list
 
@@ -47,3 +54,9 @@ fmt:
 # Clean build artifacts
 clean:
   rm -rf dist .build
+
+# Homebrew install via tap (idempotent one-liner)
+brew-published:
+  brew tap {{tap}} || true
+  HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade {{tap}}/{{formula}} || \
+  HOMEBREW_NO_AUTO_UPDATE=1 brew install {{tap}}/{{formula}}
