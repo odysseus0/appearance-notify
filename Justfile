@@ -28,15 +28,15 @@ version: ensure
 build: ensure
   scripts/build.sh
 
-# Prepare only: compute version, bump Version.swift, regenerate CHANGELOG (no tag)
+# Internal: Prepare release (authors version + changelog only)
 prepare: ensure
   scripts/prepare.sh
 
-# Publish only: tag, build, verify, create GitHub release, update formula
+# Internal: Publish release (ships artifacts/tags/releases)
 publish: ensure
   scripts/publish.sh
 
-# Full release: idempotent — uses existing preparation if present
+# Release (recommended): prepare then publish in one go; idempotent
 release: ensure
   if [[ -f .release-state ]]; then echo "Using existing preparation (.release-state)"; else scripts/prepare.sh; fi
   scripts/publish.sh

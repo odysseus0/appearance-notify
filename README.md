@@ -133,17 +133,13 @@ MIT
 
 Prerequisites: `swift`, `gh` (logged in), `git-cliff`, `svu`, `sd`, `lipo`.
 
-Run:
+Release with one command:
 
 ```bash
-# Option A: with just (recommended)
 just release
-
-# Option B: run steps separately
-just prepare && just publish
 ```
 
-This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGELOG.md` (git-cliff), tags and pushes, builds a universal binary, creates a GitHub release with notes, and updates the Homebrew tap formula (`odysseus0/homebrew-tap`).
+This will: compute the next version (svu), bump `Version.swift`, regenerate `CHANGELOG.md` (git-cliff), commit, tag and push, build a universal binary, create a GitHub release with the committed notes, and update the Homebrew tap formula (`odysseus0/homebrew-tap`).
 
 ## Developer Tasks
 
@@ -153,14 +149,13 @@ This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGE
 - just service-point-local — point Homebrew service at your local build and reload
 - just service-restore — restore Homebrew service to the original binary
 
+Other helpful tasks:
 ```bash
-just version   # preview next tag and release notes (no changes)
-just prepare   # compute version, bump Version.swift, update CHANGELOG (no tag)
-just publish   # tag, build, verify, release, update formula
-just build     # builds universal binary and packages to dist/
-just lint      # run shellcheck on scripts
-just fmt       # format scripts with shfmt
-just clean     # removes dist/ and .build
+just version         # preview next tag and release notes (no changes)
+just build           # builds universal binary and packages to dist/
+just lint            # run shellcheck on scripts
+just fmt             # format scripts with shfmt
+just clean           # removes dist/ and .build
 just brew-published  # install/upgrade from the published tap
 ```
 
