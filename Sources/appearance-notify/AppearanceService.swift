@@ -58,7 +58,12 @@ struct AppearanceService {
             var environment = [String: String]()
             environment["DARKMODE"] = darkMode ? "1" : "0"
             environment["HOME"] = FileManager.default.homeDirectoryForCurrentUser.path
-            environment["PATH"] = ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin"
+            // Build a robust PATH for hooks. launchd provides a minimal PATH; include common user locations.
+            let homePath = FileManager.default.homeDirectoryForCurrentUser.path
+            let baselinePath = "\(homePath)/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+            let inheritedPath = ProcessInfo.processInfo.environment["PATH"] ?? ""
+            let combinedPath = [baselinePath, inheritedPath].filter { !$0.isEmpty }.joined(separator: ":")
+            environment["PATH"] = combinedPath
             process.environment = environment
             
             process.standardOutput = FileHandle.nullDevice
