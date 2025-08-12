@@ -60,3 +60,22 @@ brew-published:
   brew tap {{tap}} || true
   HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade {{tap}}/{{formula}} || \
   HOMEBREW_NO_AUTO_UPDATE=1 brew install {{tap}}/{{formula}}
+
+# Simple dev workflows
+# 1) Build and run once
+run:
+  swift build -c release
+  ./.build/release/appearance-notify run
+
+# 2) Run daemon in foreground (Ctrl-C to stop)
+daemon:
+  swift build -c release
+  ./.build/release/appearance-notify daemon
+
+# 3) Point Homebrew service to local build
+service-point-local:
+  scripts/service-point-local.sh
+
+# 4) Restore Homebrew service to original
+service-restore:
+  scripts/service-restore.sh

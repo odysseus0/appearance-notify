@@ -5,8 +5,8 @@ Automatically sync developer tools with macOS appearance changes.
 ## Installation
 
 ```bash
-brew tap odysseus0/appearance-notify
-brew install appearance-notify
+brew tap odysseus0/tap
+brew install odysseus0/tap/appearance-notify
 brew services start appearance-notify
 ```
 
@@ -143,9 +143,15 @@ just release
 just prepare && just publish
 ```
 
-This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGELOG.md` (git-cliff), tags and pushes, builds a universal binary, creates a GitHub release with notes, and updates the Homebrew formula.
+This computes the next version (svu), bumps `Version.swift`, regenerates `CHANGELOG.md` (git-cliff), tags and pushes, builds a universal binary, creates a GitHub release with notes, and updates the Homebrew tap formula (`odysseus0/homebrew-tap`).
 
-### Developer Tasks
+## Developer Tasks
+
+### Simple dev workflows
+- just run — build and run hooks once with current appearance
+- just daemon — build and run watcher in foreground (Ctrl-C to stop)
+- just service-point-local — point Homebrew service at your local build and reload
+- just service-restore — restore Homebrew service to the original binary
 
 ```bash
 just version   # preview next tag and release notes (no changes)
@@ -155,6 +161,7 @@ just build     # builds universal binary and packages to dist/
 just lint      # run shellcheck on scripts
 just fmt       # format scripts with shfmt
 just clean     # removes dist/ and .build
+just brew-published  # install/upgrade from the published tap
 ```
 
 Dev tools (Homebrew):
@@ -163,3 +170,7 @@ brew bundle            # installs from Brewfile (recommended)
 # or install individually
 brew install caarlos0/tap/svu git-cliff sd gh shellcheck shfmt
 ```
+
+## Maintainers
+
+The release script clones `odysseus0/homebrew-tap` to a temporary directory, updates `Formula/appearance-notify.rb`, pushes to `main`, and cleans up. There are no additional knobs to configure.
